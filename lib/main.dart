@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 // import 'package:nc_project/pages/loading_page.dart';
 import 'package:nc_project/pages/login_page.dart';
 // import 'package:nc_project/pages/profile_page.dart';
-// import 'package:nc_project/pages/register_page.dart';
-// import 'package:nc_project/pages/chat_page.dart';
+import 'package:nc_project/pages/register_page.dart';
+import 'package:nc_project/pages/chat_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,12 +23,12 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: "login",
       routes: {
-        "/": (context) => LoginPage(),
-        // "register": (context) => RegisterPage(),
+        // "/": (context) => LoadingPage(),
+        "register": (context) => const RegisterPage(),
         "login": (context) => LoginPage(),
         // "home": (context) => HomePage(),
         // "profile": (context) => ProfilePage(),
-        // "chat": (context) => ChatPage(),
+        "chat": (context) => ChatPage(),
       },
     );
   }
