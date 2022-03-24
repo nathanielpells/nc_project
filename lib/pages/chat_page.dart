@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 
-
 class ChatPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -16,11 +15,13 @@ class Chat {
 
 class _ChatPageState extends State<ChatPage> {
   String? _message;
-  // double? _deviceHeight;
-  // double? _deviceWidth;
 
-  //avatar not needed for every message, make separate call for avater?
-  // duplicate list, delete username and add isuser : true/false pair? or just include as additional pair?
+//instances of db channel and doc
+  final CollectionReference _channels =
+      FirebaseFirestore.instance.collection('channels');
+  final DocumentReference _user1User2Chat =
+      FirebaseFirestore.instance.collection('channels').doc('User1_User2');
+
   final List<Chat> _chat = [
     Chat(
       'https://i.pravatar.cc/50?img=50',
@@ -34,123 +35,12 @@ class _ChatPageState extends State<ChatPage> {
       'hi',
       '12:45',
     ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'Hey',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=40',
-      'User2',
-      'Hola',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'Nihao',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=40',
-      'User2',
-      'hi',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'Hey',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=40',
-      'User2',
-      'hi',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'Hey',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=40',
-      'User2',
-      'Hola',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'Nihao',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=40',
-      'User2',
-      'hi',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'Hey',
-      '12:45',
-    ),
-    Chat(
-      'https://i.pravatar.cc/50?img=50',
-      'User1',
-      'hello',
-      '12:45',
-    ),
   ];
-  List extendedChat = [];
 
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    // _deviceHeight = MediaQuery.of(context).size.height;
-    // _deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(title: const Text('Conversation with User2')),
       body: SafeArea(
@@ -158,13 +48,16 @@ class _ChatPageState extends State<ChatPage> {
           Flexible(
             child: SizedBox(
               child: StreamBuilder(
+                  // below: points to specific doc in db
                   stream: FirebaseFirestore.instance
                       .collection('channels')
+                      .doc('User1_User2')
                       .snapshots(),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (!snapshot.hasData) return const Text('Loading...');
                     return ListView.builder(
-                      itemCount: snapshot.data.docs.User1_User2.thread.length,
+                      // below: how many items to iterate over to be displayed
+                      itemCount: snapshot.data['thread'].length,
                       itemBuilder: (context, int index) => Card(
                         child: ListTile(
                           title: Align(
@@ -181,8 +74,8 @@ class _ChatPageState extends State<ChatPage> {
                               child: Padding(
                                 padding: const EdgeInsets.all(12),
                                 child: Text(
-                                  snapshot.data.docs[index].User1_User2
-                                      .thread[index].content,
+                                  // line below is db route to be displayed as message
+                                  snapshot.data['thread'][index]['content'],
                                   style: const TextStyle(
                                     color: Colors.white,
                                   ),
@@ -215,34 +108,21 @@ class _ChatPageState extends State<ChatPage> {
             onChanged: (_value) {
               setState(() {
                 _message = _value;
-                print(_value);
               });
             },
           ),
         ),
         ElevatedButton(
           onPressed: () => {
-            print(extendedChat.length),
-            setState(() {
-              extendedChat = [
-                ..._chat,
-                Chat(
-                  'https://i.pravatar.cc/50?img=50',
-                  'User1',
-                  '$_message',
-                  '12:45',
-                )
-              ];
-            }),
-            _chat.add(
-              Chat(
-                'https://i.pravatar.cc/50?img=50',
-                'User1',
-                '$_message',
-                '12:45',
-              ),
-            ),
-            print(extendedChat.length)
+            // if (no channel/chat between current user and 2nd user exists) { create channel and post message}
+            // else { get and display existing messages and post new message to db }
+
+            // .set on instance of doc(_user1User2Chat) overwrites current doc but SetOptions(merge:true) should make it be added it instead
+            // _user1User2Chat
+            //     .set({'key':'value'}, SetOptions(merge: true))
+            //     .then((value) => print("Message Added"))
+            //     .catchError(
+            //         (error) => print("Failed to send message: $error"))
           },
           child: const Text('Send'),
         ),
@@ -251,35 +131,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 }
 
-//difference between class and creating widget in register page.dart?
-//set state or invoke db patch?
+//users are currently hardcoded
+//this page should come from messages page with list of all users chats with other users or display tabs of other convos at top of page
+//authentication
 
-  //validation correct/needed/alternative needed?
-  //setstate error
-
-
-  //opens chat page from allmesages or send message from other users profile page
-  // call to db is made to check if chat already exists for 2 users
-  //if so their document? is retreived and messages data populates screen
-  //if not new collection? is made for both users
-  //current user field added/ variable state set?
-
-  //design and create firebase messages collection
-  //link from  screenshot/video
-  //authentication?
-  //patch to db function
-  //apply to ios and web
-
-  //display avatars
-  //onclick timestamp
-  //add message input box and button ------- first
-  //remove card lines and improve styling
-  //wrapping in messages
-  //implement isuser true/false for alignment
-  // data from db format changed to have isuser key?
-  //refacter: extract some widgets to be outside of tree?
-  //validation excludes empty messages
-  // title uses non hardcoded udernames and avatars?
-  // drawer for other chats? 
-  //auto scroll
-
+//display avatars
+//onclick timestamp
+//wrapping in messages
+// title to use non hardcoded usernames and avatars
+//auto scroll
