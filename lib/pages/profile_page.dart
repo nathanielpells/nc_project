@@ -107,17 +107,21 @@ class _ProfilePageState extends State<ProfilePage> {
             children: [
               Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     _userCard(),
                     _myPetsTitle(),
                     _userPetsCard(),
-                    _myReviewsTitle(),
-                    widget._passedInData != null
-                        ? _addReviewButton()
-                        : const Text(''),
+                    Row(
+                      children: [
+                        _myReviewsTitle(),
+                        widget._passedInData != null
+                            ? _addReviewButton()
+                            : const Text(''),
+                      ],
+                    ),
                     _userReviewsCard(),
                     _logoutButton(),
                   ],
@@ -388,22 +392,26 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _addButton() {
-    return SizedBox.fromSize(
-      size: const Size(50, 50),
-      child: ClipOval(
-        child: Material(
-          color: const Color.fromARGB(255, 236, 68, 68),
-          child: InkWell(
-            onTap: () => Navigator.pushNamed(context, "addpet"),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.pets,
-                  color: Colors.white,
-                ), // <-- Icon
-                Text("Add", style: TextStyle(color: Colors.white)), // <-- Text
-              ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 140, bottom: 80),
+      child: SizedBox.fromSize(
+        size: const Size(50, 50),
+        child: ClipOval(
+          child: Material(
+            color: const Color.fromARGB(255, 236, 68, 68),
+            child: InkWell(
+              onTap: () => Navigator.pushNamed(context, "addpet"),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.pets,
+                    color: Colors.white,
+                  ), // <-- Icon
+                  Text("Add",
+                      style: TextStyle(color: Colors.white)), // <-- Text
+                ],
+              ),
             ),
           ),
         ),
@@ -412,34 +420,38 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _messageButton(_username, _img) {
-    return SizedBox.fromSize(
-      size: const Size(50, 50),
-      child: ClipOval(
-        child: Material(
-          color: Colors.blue,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return ChatDetailPage(
-                    name: _username,
-                    otherUser: _idToUse,
-                    image: _img,
-                    fromChat: false,
-                  );
-                }),
-              );
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.chat,
-                  color: Colors.white,
-                ), // <-- Icon
-                Text("Chat", style: TextStyle(color: Colors.white)), // <-- Text
-              ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 140),
+      child: SizedBox.fromSize(
+        size: const Size(50, 50),
+        child: ClipOval(
+          child: Material(
+            color: Colors.blue,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return ChatDetailPage(
+                      name: _username,
+                      otherUser: _idToUse,
+                      image: _img,
+                      fromChat: false,
+                    );
+                  }),
+                );
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.chat,
+                    color: Colors.white,
+                  ), // <-- Icon
+                  Text("Chat",
+                      style: TextStyle(color: Colors.white)), // <-- Text
+                ],
+              ),
             ),
           ),
         ),
@@ -568,26 +580,29 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _addReviewButton() {
-    return SizedBox.fromSize(
-      size: const Size(50, 50),
-      child: ClipOval(
-        child: Material(
-          color: Colors.green,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return AddReviewPage(widget._passedInData);
-              }));
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(
-                  Icons.rate_review,
-                  color: Colors.white,
-                ),
-                Text('Add', style: TextStyle(color: Colors.white)),
-              ],
+    return Padding(
+      padding: const EdgeInsets.only(left: 140, top: 50, bottom: 60),
+      child: SizedBox.fromSize(
+        size: const Size(50, 50),
+        child: ClipOval(
+          child: Material(
+            color: Colors.green,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return AddReviewPage(widget._passedInData);
+                }));
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.rate_review,
+                    color: Colors.white,
+                  ),
+                  Text('Add', style: TextStyle(color: Colors.white)),
+                ],
+              ),
             ),
           ),
         ),
